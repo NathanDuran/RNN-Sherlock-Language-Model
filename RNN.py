@@ -1,15 +1,15 @@
 import time
 import sys
-import numpy as np
-import Utilities as util
+from Utilities import *
 
 
 class RNN:
 
     ##### Initialise #####
-    def __init__(self, vocabulary_size, hidden_layer=100, back_prop_through_time_truncate=4):
+    def __init__(self, model_path, vocabulary_size, hidden_layer, back_prop_through_time_truncate=4):
 
         # Assign instance variables
+        self.model_path = model_path
         self.word_dimension = vocabulary_size
         self.hidden_dimension = hidden_layer
         self.bptt_truncate = back_prop_through_time_truncate
@@ -49,8 +49,10 @@ class RNN:
 
             # Optionally evaluate the loss
             if epoch % evaluate_loss_after == 0:
+
                 loss = model.calculate_loss(x_train, y_train)
                 losses.append((num_examples_seen, loss))
+
                 current_time = time.asctime(time.localtime(time.time()))
                 print("%s: Loss after num_examples_seen = %d epoch = %d: %f" % (current_time, num_examples_seen, epoch, loss))
 
@@ -59,6 +61,9 @@ class RNN:
                     learning_rate = learning_rate * 0.5
                     print("Setting learning rate to %f" % learning_rate)
                 sys.stdout.flush()
+
+                # Saving model parameters
+                save_model_parameters(model.model_path, model)
 
             # For each training example...
             for i in range(len(y_train)):
@@ -148,7 +153,6 @@ class RNN:
     # - output: is the output at step t.
     #   The next word in a sentence it is a vector of probabilities across the vocabulary.
     #   output = softmax( outputWeights * hiddenState )
-    #
     def forward_propagation(self, input_sentence):
 
         # The total number of time steps
@@ -166,9 +170,8 @@ class RNN:
         for t in np.arange(steps):
             # Note that we are indexing inputWeights by input_sentence[t].
             # This is the same as multiplying inputWeights with a one-hot vector.
-            hidden_state[t] = np.tanh(
-                self.input_weights[:, input_sentence[t]] + self.hidden_weights.dot(hidden_state[t - 1]))
-            output[t] = util.softmax(self.output_weights.dot(hidden_state[t]))
+            hidden_state[t] = np.tanh(self.input_weights[:, input_sentence[t]] + self.hidden_weights.dot(hidden_state[t - 1]))
+            output[t] = softmax(self.output_weights.dot(hidden_state[t]))
 
         return [output, hidden_state]
 
@@ -208,6 +211,33 @@ class RNN:
 
         return total_loss / num_training_examples
 
+    ##### Generate New Sentences #####
+    # Generates a random new sentence from a trained model
+    # Returns a list of words for generated sentence
+    #
+    # - word_to_index: Mapping of vocabulary words to index
+    # - index_to_word: Mapping of index to vocabulary words
+    def generate_sentence(model, word_to_index, index_to_word):
 
+        unknown_token = "UNKNOWN_TOKEN"
+        sentence_start_token = "SENTENCE_START"
+        sentence_end_token = "SENTENCE_END"
+
+        # We start the sentence with the start token
+        new_sentence = [word_to_index[sentence_start_token]]
+
+        # Repeat until we get an end token
+        while not new_sentence[-1] == word_to_index[sentence_end_token]:
+            next_word_probs = model.forward_propagation(new_sentence)[0]
+            sampled_word = word_to_index[unknown_token]
+
+            # We don't want to sample unknown words
+            while sampled_word == word_to_index[unknown_token]:
+                samples = np.random.multinomial(1, next_word_probs[-1])
+                sampled_word = np.argmax(samples)
+
+            new_sentence.append(sampled_word)
+        sentence_str = [index_to_word[x] for x in new_sentence[1:-1]]
+        return sentence_str
 
 

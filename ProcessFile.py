@@ -16,19 +16,23 @@ class ProcessFile:
     word_frequency = []
     # Total number of words in training set
     vocabulary = []
-    # Word indexes
-    index_to_word = []
-    word_to_index = []
-
-    # Example and labeled training sets
-    x_train = []
-    y_train = []
+    # # Word indexes
+    # index_to_word = []
+    # word_to_index = ()
+    # # Example and labeled training sets
+    # x_train = []
+    # y_train = []
 
     def __init__(self, vocabulary_size, file_path):
 
         self.vocabulary_size = vocabulary_size
         self.file = open(file_path).read()
-
+        # Word indexes
+        self.index_to_word = []
+        self.word_to_index = ()
+        # Example and labeled training sets
+        self.x_train = []
+        self.y_train = []
     # Tokenize the text into sentences
     # Removes extra white space characters
     # Appends start and end tokens
