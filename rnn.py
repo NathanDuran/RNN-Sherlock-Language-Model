@@ -47,14 +47,17 @@ class RNN:
 
         for epoch in range(num_epoch):
 
+            # Display current epoch
+            current_time = time.asctime(time.localtime(time.time()))
+            print("%s: Number of examples seen = %d epoch = %d" % (
+                current_time, num_examples_seen, epoch))
+
             # Optionally evaluate the loss
             if epoch % evaluate_loss_after == 0:
 
                 loss = model.calculate_loss(x_train, y_train)
                 losses.append((num_examples_seen, loss))
-
-                current_time = time.asctime(time.localtime(time.time()))
-                print("%s: Loss after num_examples_seen = %d epoch = %d: %f" % (
+                print("%s: Loss after number of examples seen = %d epoch = %d: %f" % (
                 current_time, num_examples_seen, epoch, loss))
 
                 # Adjust the learning rate if loss increases
@@ -173,7 +176,7 @@ class RNN:
             # This is the same as multiplying inputWeights with a one-hot vector.
             hidden_state[t] = np.tanh(
                 self.input_weights[:, input_sentence[t]] + self.hidden_weights.dot(hidden_state[t - 1]))
-            output[t] = softmax(self.output_weights.dot(hidden_state[t]))
+            output[t] = self.softmax(self.output_weights.dot(hidden_state[t]))
 
         return [output, hidden_state]
 
@@ -199,7 +202,7 @@ class RNN:
 
         # For each sentence...
         for i in np.arange(len(y_train)):
-            # Perform iteration of forward propogation
+            # Perform iteration of forward propagation
             output, hidden_state = self.forward_propagation(x_train[i])
 
             # We only care about our prediction of the "correct" words in current sentence
@@ -242,7 +245,7 @@ class RNN:
         sentence_str = [index_to_word[x] for x in new_sentence[1:-1]]
         return sentence_str
 
-    def softmax(x):
+    def softmax(self, x):
         xt = np.exp(x - np.max(x))
         return xt / np.sum(xt)
 

@@ -1,4 +1,5 @@
 import timeit
+import string
 import rnn
 from utilities import *
 
@@ -6,7 +7,7 @@ from utilities import *
 vocabulary_size = 8000
 hidden_layer = 100
 learning_rate = 0.005
-num_epoch = 50
+num_epoch = 10
 
 # File Paths
 file_path = "resources\The Adventures of Sherlock Holmes (No Titles).txt"
@@ -18,13 +19,21 @@ data_path = "./data/rnn-sherlock-training-data.pkl"
 def train(num_examples):
     time_taken = timeit.Timer(lambda: model.train_with_sgd(x_train[:num_examples], y_train[:num_examples], learning_rate, num_epoch)).timeit(number=1)
     print("Time taken (in seconds) for ", num_epoch, " epoch over " + str(num_examples) + " training data : ", time_taken)
-    # 100 training examples for 50 epoch took 719 seconds
 
 
 # Generate a random sentence using the current model
 def generate_sentence():
-    sentence = model.generate_sentence(word_to_index, index_to_word)
-    print("Generated sentence: " + str(sentence))
+
+    sentence = ""
+    sentence_list = model.generate_sentence(word_to_index, index_to_word)
+
+    for i, word in enumerate(sentence_list):
+        if word in string.punctuation:
+            sentence += word
+        else:
+            sentence += " " + word
+    sentence.lstrip()
+    print("Generated sentence: " + sentence)
     return sentence
 
 
@@ -87,18 +96,22 @@ y_train = data["y_train"]
 word_to_index = data["word_to_index"]
 index_to_word = data["index_to_word"]
 
+load_model()
 
 # test_predictions()
 # test_sgd()
 # calc_loss()
 
-# train(100)
 
+
+# train(len(x_train))
+#
 # save_model()
 
-load_model()
-
 generate_sentence()
+
+#Saved model parameters to ./data/rnn-sherlock-language-model hidden_dimension=100  word_dimensions=8000.npz.
+#Generated sentence: ['said', 'of', 'course', ',', 'leaning', 'neither', ',', 'dear', 'employer', ',', 'Miss', 'side', 'was', 'just', 'to', 'you', ';', 'but', 'returning', 'groping', ',', 'but', 'he', 'makes', 'her', 'that', 'round', 'she', 'were', 'an', 'deduction', 'before', 'I', 'could', 'pray', 'of', 'turning', 'I', 'never', 'the', 'road', 'of', 'Oxfordshire', 'of', 'the', 'extreme', '.']
 
 
 
