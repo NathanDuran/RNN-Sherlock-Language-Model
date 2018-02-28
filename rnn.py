@@ -45,7 +45,13 @@ class RNN:
         losses = []
         num_examples_seen = 0
 
-        for epoch in range(num_epoch):
+        for epoch in range(1, num_epoch + 1):
+
+            # For each training example...
+            for i in range(len(y_train)):
+                # One SGD step
+                model.sgd_step(x_train[i], y_train[i], learning_rate)
+                num_examples_seen += 1
 
             # Display current epoch
             current_time = time.asctime(time.localtime(time.time()))
@@ -58,22 +64,16 @@ class RNN:
                 loss = model.calculate_loss(x_train, y_train)
                 losses.append((num_examples_seen, loss))
                 print("%s: Loss after number of examples seen = %d epoch = %d: %f" % (
-                current_time, num_examples_seen, epoch, loss))
+                    current_time, num_examples_seen, epoch, loss))
 
                 # Adjust the learning rate if loss increases
                 if len(losses) > 1 and losses[-1][1] > losses[-2][1]:
                     learning_rate = learning_rate * 0.5
                     print("Setting learning rate to %f" % learning_rate)
-                sys.stdout.flush()
+                    sys.stdout.flush()
 
-                # Saving model parameters
-                save_model_parameters(model.model_path, model)
-
-            # For each training example...
-            for i in range(len(y_train)):
-                # One SGD step
-                model.sgd_step(x_train[i], y_train[i], learning_rate)
-                num_examples_seen += 1
+                    # Saving model parameters
+                    save_model_parameters(model.model_path, model)
 
     # Performs one step of SGD.
     # Calls back_prop_through_time for the input sentence
@@ -248,4 +248,3 @@ class RNN:
     def softmax(self, x):
         xt = np.exp(x - np.max(x))
         return xt / np.sum(xt)
-

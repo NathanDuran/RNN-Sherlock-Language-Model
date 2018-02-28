@@ -11,6 +11,15 @@ To generate a sentence with the included pre-trained model simply run rnn_sherlo
 
 # Example of Generated Sentences
 
+10 Epoch - said of course, leaning neither, dear employer, Miss side was just to you; but returning groping, but he makes her that round she were an deduction before I could pray of turning I never the road of Oxfordshire of the extreme.
+
+20 Epoch - said of Holmes, Mrs. Holmes, though a moment were repaid in different, certainly from your instant of our word and, and to-day, then, you suppose, Alice to do for where?
+
+30 Epoch - said of a very engineer lens," fascinating, the dear light, much, now, who was let her that we were observed that it was I. from his strength, with a rough during in a nice of good-fortune, together at your with your good villain," said she gravely, on here and no real that it is a hundred feeling, but he answered you look, and was not deserted house your dear Rucastle, Miss Toller?"
+
+40 Epoch - said of Holmes, protruded Toller to introduce any three together.
+
+50 Epoch - said of a serious, for success --" said Holmes," of no means recollect for weeks fact that, and when Holmes suddenly all my trivial, then, you shall tell it out and found.
 
 # Included Python Files
 

@@ -1,5 +1,8 @@
 import timeit
 import string
+
+import re
+
 import rnn
 from utilities import *
 
@@ -28,10 +31,16 @@ def generate_sentence():
     sentence_list = model.generate_sentence(word_to_index, index_to_word)
 
     for i, word in enumerate(sentence_list):
-        if word in string.punctuation:
+
+        if word in ["``", "''"]:
+            word = '"'
+
+        if word is '"' or word in string.punctuation:
             sentence += word
         else:
             sentence += " " + word
+
+    sentence = re.sub(r'\s([?.!,"](?:\s|$))', r'\1', sentence)
     sentence.lstrip()
     print("Generated sentence: " + sentence)
     return sentence
@@ -102,16 +111,12 @@ load_model()
 # test_sgd()
 # calc_loss()
 
+train(len(x_train))
 
-
-# train(len(x_train))
-#
-# save_model()
+save_model()
 
 generate_sentence()
 
-#Saved model parameters to ./data/rnn-sherlock-language-model hidden_dimension=100  word_dimensions=8000.npz.
-#Generated sentence: ['said', 'of', 'course', ',', 'leaning', 'neither', ',', 'dear', 'employer', ',', 'Miss', 'side', 'was', 'just', 'to', 'you', ';', 'but', 'returning', 'groping', ',', 'but', 'he', 'makes', 'her', 'that', 'round', 'she', 'were', 'an', 'deduction', 'before', 'I', 'could', 'pray', 'of', 'turning', 'I', 'never', 'the', 'road', 'of', 'Oxfordshire', 'of', 'the', 'extreme', '.']
 
 
 
