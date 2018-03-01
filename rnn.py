@@ -41,6 +41,10 @@ class RNN:
     # - evaluateLossAfter: Evaluate the loss after this many epochs
     def train_with_sgd(model, x_train, y_train, learning_rate=0.005, num_epoch=100, evaluate_loss_after=5):
 
+        # Timer
+        current_time = time.asctime(time.localtime(time.time()))
+        print("Training started at : % for % epochs" % (current_time, num_epoch))
+
         # We keep track of the losses so we can plot them later
         losses = []
         num_examples_seen = 0
@@ -54,7 +58,6 @@ class RNN:
                 num_examples_seen += 1
 
             # Display current epoch
-            current_time = time.asctime(time.localtime(time.time()))
             print("%s: Number of examples seen = %d epoch = %d" % (
                 current_time, num_examples_seen, epoch))
 

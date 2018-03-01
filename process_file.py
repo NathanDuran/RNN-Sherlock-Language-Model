@@ -3,7 +3,7 @@ import nltk
 from utilities import *
 
 # File paths
-file_path = "resources\The Adventures of Sherlock Holmes (No Titles).txt"
+file_path = "resources\Short Stories.txt"
 data_path = "./data/rnn-sherlock-training-data.pkl"
 
 # Sentence tokens
@@ -26,6 +26,11 @@ sentences = nltk.sent_tokenize(file)
 
 # Remove extra whitespace
 sentences = [' '.join(line.split()).strip() for line in sentences]
+
+# Write sentences to file
+# with open("resources\Short Stories (Sentences).txt", 'w') as file:
+#     for line in sentences:
+#         file.write(line + "\n")
 
 # Append SENTENCE_START and SENTENCE_END tokens
 sentences = ["%s %s %s" % (sentence_start_token, sentence, sentence_end_token) for sentence in

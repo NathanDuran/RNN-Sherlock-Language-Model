@@ -1,8 +1,7 @@
 import timeit
+import datetime
 import string
-
 import re
-
 import rnn
 from utilities import *
 
@@ -10,12 +9,15 @@ from utilities import *
 vocabulary_size = 8000
 hidden_layer = 100
 learning_rate = 0.005
-num_epoch = 10
+num_epoch = 1
 
 # File Paths
-file_path = "resources\The Adventures of Sherlock Holmes (No Titles).txt"
-model_path = "./data/rnn-sherlock-language-model hidden_dimension=" + str(hidden_layer) + "  word_dimensions=" + str(vocabulary_size) + ".npz"
+file_path = "resources\Short Stories.txt"
 data_path = "./data/rnn-sherlock-training-data.pkl"
+model_path = "./data/rnn-sherlock-language-model " \
+             + datetime.datetime.today().strftime('%d-%m-%Y') \
+             + " hidden_layers=" + str(hidden_layer) \
+             + "  vocabulary=" + str(vocabulary_size) + ".npz"
 
 
 # Train a model using Stochastic Gradient Descent
