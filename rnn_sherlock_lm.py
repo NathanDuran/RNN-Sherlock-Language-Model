@@ -49,7 +49,7 @@ def generate_sentence():
 
 
 # Calculate the current loss/error of the model
-def calc_loss(number_trainin_examples=1000):
+def calc_loss(number_trainin_examples=100):
     # Test loss function (limit to 1000 examples to save time)
     print("Expected Loss for random predictions: %f" % np.log(vocabulary_size))
     print("Actual loss: %f" % model.calculate_loss(x_train[:number_trainin_examples], y_train[:number_trainin_examples]))
@@ -108,15 +108,15 @@ index_to_word = data["index_to_word"]
 
 # load_model()
 
-# test_predictions()
+test_predictions()
 # test_sgd()
-# calc_loss()
+calc_loss()
 
-train(len(x_train))
+#train(len(x_train))
 
-save_model()
+#save_model()
 
-generate_sentence()
+#generate_sentence()
 
 
 

@@ -58,7 +58,7 @@ def calc_loss(number_trainin_examples=1000):
 # Test forward propagation and predictions for one sentence
 def test_predictions(sentence_index=0):
     # For the input sentence the model outputs vocabulary_size vector for each word
-    output, hidden_state = model.forward_propagation(x_train[sentence_index])
+    output, h, c = model.forward_propagation(x_train[sentence_index])
     print("Output dimensions ", output.shape)
     print(output)
 
@@ -109,14 +109,14 @@ index_to_word = data["index_to_word"]
 # load_model()
 
 # test_predictions()
-# test_sgd()
+# # test_sgd()
 # calc_loss()
 
-train(len(x_train))
+train(10)
 
-save_model()
+#save_model()
 
-generate_sentence()
+#generate_sentence()
 
 
 

@@ -18,13 +18,14 @@ class RNN:
         # in range [- (1/sqrt of n), 1/sqrt of n)] where n = number of incoming connections from previous layer
 
         # Input weights (hidden_layer, vocabulary_size)
-        self.input_weights = np.random.uniform(-np.sqrt(1. / self.word_dimension), np.sqrt(1. / self.word_dimension),
+        self.input_weights = np.random.uniform(-np.sqrt(1. / self.word_dimension),
+                                               np.sqrt(1. / self.word_dimension),
                                                (self.hidden_dimension, self.word_dimension))
         # Output weights (vocabulary_size, hidden_layer)
         self.output_weights = np.random.uniform(-np.sqrt(1. / self.hidden_dimension),
                                                 np.sqrt(1. / self.hidden_dimension),
                                                 (self.word_dimension, self.hidden_dimension))
-        # Hidden weights (hidden_layer, vocabulary_size)
+        # Hidden weights (hidden_layer, hidden_layer)
         self.hidden_weights = np.random.uniform(-np.sqrt(1. / self.hidden_dimension),
                                                 np.sqrt(1. / self.hidden_dimension),
                                                 (self.hidden_dimension, self.hidden_dimension))
@@ -122,7 +123,7 @@ class RNN:
         output_delta[np.arange(len(y_sent)), y_sent] -= 1.
 
         # For each word from the end of the sentence backwards...
-        for word in np.arange(sentence_length)[::-1]:
+        for word in reversed(np.arange(sentence_length)):
 
             # Gradient of output_weights is the matrix multiplication (outer product) of the,
             # output change vector and hidden state vector (.T = transpose)
@@ -133,7 +134,7 @@ class RNN:
             delta = self.output_weights.T.dot(output_delta[word]) * (1 - (hidden_state[word] ** 2))
 
             # Backpropagation through time (for at most self.bptt_truncate steps)
-            for bptt_step in np.arange(max(0, word - self.bptt_truncate), word + 1)[::-1]:
+            for bptt_step in reversed(np.arange(max(0, word - self.bptt_truncate), word + 1)):
                 # Gradient of hidden_weights is the matrix multiplication (outer product) of the,
                 # delta (change) vector and the previous hidden state vector
                 gradient_hidden_weights += np.outer(delta, hidden_state[bptt_step - 1])
@@ -168,8 +169,9 @@ class RNN:
         # During forward propagation we save all hidden states because we need them later.
         # We add one additional element for the initial hidden state, which we set to 0
         hidden_state = np.zeros((steps + 1, self.hidden_dimension))
-        hidden_state[-1] = np.zeros(self.hidden_dimension)
-
+        # print("HIDDEN SHAPE " + str(hidden_state.shape))
+        #hidden_state[-1] = np.zeros(self.hidden_dimension)
+        # print("HIDDEN SHAPE " + str(hidden_state.shape))
         # The outputs at each time step. Again, we save them for later.
         output = np.zeros((steps, self.word_dimension))
 
