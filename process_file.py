@@ -4,7 +4,7 @@ from utilities import *
 
 # File paths
 file_path = "resources\Short Stories.txt"
-data_path = "./data/rnn-sherlock-training-data.pkl"
+data_path = "./data/sherlock-training-data.pkl"
 
 # Sentence tokens
 unknown_token = "UNKNOWN_TOKEN"
@@ -44,7 +44,7 @@ tokenized_sentences = [nltk.word_tokenize(sentence) for sentence in sentences]
 word_frequency = nltk.FreqDist(itertools.chain(*tokenized_sentences))
 
 # Get the most common words and build index to word and word to index vectors
-vocabulary = word_frequency.most_common(vocabulary_size - 1)
+vocabulary = word_frequency.most_common(vocabulary_size -1)
 print("Found %d unique word tokens." % len(word_frequency.items()))
 
 # Generate word to index and index to words
@@ -84,7 +84,8 @@ data = dict(
     x_train=x_train,
     y_train=y_train,
     word_to_index=word_to_index,
-    index_to_word=index_to_word, )
+    index_to_word=index_to_word,
+    vocabulary=vocabulary)
 
 print("Saving training data")
 try:

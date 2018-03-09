@@ -43,7 +43,7 @@ class RNN:
 
         # Timer
         current_time = time.asctime(time.localtime(time.time()))
-        print("Training started at : % for % epochs" % (current_time, num_epoch))
+        print("Training started at : " + current_time + " for " + str(num_epoch) + " epochs")
 
         # We keep track of the losses so we can plot them later
         losses = []
@@ -117,20 +117,20 @@ class RNN:
         gradient_hidden_weights = np.zeros(self.hidden_weights.shape)
 
         # Change in output
-        delta_o = output
+        output_delta = output
         # Effectively ignore the SENTENCE_END token by adding -1
-        delta_o[np.arange(len(y_sent)), y_sent] -= 1.
+        output_delta[np.arange(len(y_sent)), y_sent] -= 1.
 
         # For each word from the end of the sentence backwards...
         for word in np.arange(sentence_length)[::-1]:
 
             # Gradient of output_weights is the matrix multiplication (outer product) of the,
             # output change vector and hidden state vector (.T = transpose)
-            gradient_out_weights += np.outer(delta_o[word], hidden_state[word].T)
+            gradient_out_weights += np.outer(output_delta[word], hidden_state[word].T)
 
             # Initial delta calculation, the change in weights,
             # the dot product (sum) of ( output change vector * (1 -  hidden state vector ^ 2) )
-            delta = self.output_weights.T.dot(delta_o[word]) * (1 - (hidden_state[word] ** 2))
+            delta = self.output_weights.T.dot(output_delta[word]) * (1 - (hidden_state[word] ** 2))
 
             # Backpropagation through time (for at most self.bptt_truncate steps)
             for bptt_step in np.arange(max(0, word - self.bptt_truncate), word + 1)[::-1]:
@@ -165,7 +165,7 @@ class RNN:
         # The total number of time steps
         steps = len(input_sentence)
 
-        # During forward propagation we save all hidden states in s because we need them later.
+        # During forward propagation we save all hidden states because we need them later.
         # We add one additional element for the initial hidden state, which we set to 0
         hidden_state = np.zeros((steps + 1, self.hidden_dimension))
         hidden_state[-1] = np.zeros(self.hidden_dimension)

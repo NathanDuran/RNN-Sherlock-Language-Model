@@ -13,7 +13,7 @@ num_epoch = 1
 
 # File Paths
 file_path = "resources\Short Stories.txt"
-data_path = "./data/rnn-sherlock-training-data.pkl"
+data_path = "./data/sherlock-training-data.pkl"
 model_path = "./data/rnn-sherlock-language-model " \
              + datetime.datetime.today().strftime('%d-%m-%Y') \
              + " hidden_layers=" + str(hidden_layer) \
@@ -100,14 +100,13 @@ try:
 except FileNotFoundError as err:
     print("No saved training data found!")
 
-
 # Training data
 x_train = data["x_train"]
 y_train = data["y_train"]
 word_to_index = data["word_to_index"]
 index_to_word = data["index_to_word"]
 
-load_model()
+# load_model()
 
 # test_predictions()
 # test_sgd()
