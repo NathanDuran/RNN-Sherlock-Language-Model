@@ -21,13 +21,13 @@ class LSTM:
 
         # Input weights (vocabulary_size, hidden_layer)
         self.input_weights_g = np.random.uniform(-np.sqrt(1. / self.word_dimension), np.sqrt(1. / self.word_dimension),
-                                               (self.word_dimension, self.hidden_dimension))
+                                               (self.hidden_dimension, self.word_dimension))
         self.input_weights_i = np.random.uniform(-np.sqrt(1. / self.word_dimension), np.sqrt(1. / self.word_dimension),
-                                                 (self.word_dimension, self.hidden_dimension))
+                                                 (self.hidden_dimension, self.word_dimension))
         self.input_weights_f = np.random.uniform(-np.sqrt(1. / self.word_dimension), np.sqrt(1. / self.word_dimension),
-                                                 (self.word_dimension, self.hidden_dimension))
+                                                 (self.hidden_dimension, self.word_dimension))
         self.input_weights_o = np.random.uniform(-np.sqrt(1. / self.word_dimension), np.sqrt(1. / self.word_dimension),
-                                                 (self.word_dimension, self.hidden_dimension))
+                                                 (self.hidden_dimension, self.word_dimension))
 
         # Hidden weights (hidden_layer, hidden_layer)
         self.hidden_weights_g = np.random.uniform(-np.sqrt(1. / self.hidden_dimension), np.sqrt(1. / self.hidden_dimension),
@@ -122,10 +122,10 @@ class LSTM:
         self.input_weights_f -= learning_rate * gradients["in_f"]
         self.input_weights_o -= learning_rate * gradients["in_o"]
 
-        self.hidden_weights_g -= learning_rate * gradients["h_g"]
-        self.hidden_weights_i -= learning_rate * gradients["h_i"]
-        self.hidden_weights_f -= learning_rate * gradients["h_f"]
-        self.hidden_weights_o -= learning_rate * gradients["h_o"]
+        # self.hidden_weights_g -= learning_rate * gradients["h_g"]
+        # self.hidden_weights_i -= learning_rate * gradients["h_i"]
+        # self.hidden_weights_f -= learning_rate * gradients["h_f"]
+        # self.hidden_weights_o -= learning_rate * gradients["h_o"]
 
         self.bias_g -= learning_rate * gradients["b_g"]
         self.bias_i -= learning_rate * gradients["b_i"]
@@ -153,15 +153,15 @@ class LSTM:
         output, h, c = self.forward_propagation(x_sent)
 
         # We accumulate the gradients in these variables
-        gradient_in_g = np.zeros(self.input_weights_g.shape)
+        gradient_in_g = np.zeros(self.input_weights_g.shape, dtype=np.float64)
         gradient_in_i = np.zeros(self.input_weights_i.shape)
         gradient_in_f = np.zeros(self.input_weights_f.shape)
         gradient_in_o = np.zeros(self.input_weights_o.shape)
 
-        gradient_hidden_g = np.zeros(self.input_weights_g.shape)
-        gradient_hidden_i = np.zeros(self.input_weights_i.shape)
-        gradient_hidden_f = np.zeros(self.input_weights_f.shape)
-        gradient_hidden_o = np.zeros(self.input_weights_o.shape)
+        gradient_hidden_g = np.zeros(self.hidden_weights_g.shape, dtype=np.float64)
+        gradient_hidden_i = np.zeros(self.hidden_weights_i.shape, dtype=np.float64)
+        gradient_hidden_f = np.zeros(self.hidden_weights_f.shape, dtype=np.float64)
+        gradient_hidden_o = np.zeros(self.hidden_weights_o.shape, dtype=np.float64)
 
         gradient_bias_g = np.zeros(self.bias_g.shape)
         gradient_bias_i = np.zeros(self.bias_i.shape)
@@ -196,54 +196,57 @@ class LSTM:
             gradient_h[word] = np.dot(output_delta[word], self.output_weights)
             gradient_h[word] += gradient_h_next[word]
 
-            print("H W SHAPE " + str(self.hidden_weights_o.shape))
-            print("G H SHAPE" + str(gradient_hidden_o[word].shape))
-            print("G O H SHAPE" + str(gradient_hidden_o.shape))
+
             # Gradient for c
             gradient_c[word] = self.hidden_weights_o[word] * gradient_h[word] * self.dtanh(c[word])
             gradient_c[word] += gradient_c_next[word]
 
-            # Gradient for hidden_weights_o
-            gradient_hidden_o[word] += np.tanh(c[word]) * gradient_h[word]
-            gradient_hidden_o[word] += self.dsigmoid(self.hidden_weights_o[word]) * gradient_hidden_o[word]
+
+            # Gradient for hidden_weights_o ??????????????
+            gradient_hidden_o += np.tanh(c[word]) * gradient_h[word]
+            gradient_hidden_o += np.dot(self.dsigmoid(self.hidden_weights_o[word]), gradient_hidden_o[word])
 
             # Gradient for hidden_weights_f
-            gradient_hidden_f += c[word - 1] * gradient_c
-            gradient_hidden_f += self.dsigmoid(self.hidden_weights_f) * gradient_hidden_f
+            gradient_hidden_f += np.dot(c[word - 1], gradient_c[word])
+            gradient_hidden_f += np.dot(self.dsigmoid(self.hidden_weights_f[word]), gradient_hidden_f[word])
 
             # Gradient for gradient_hidden_i
-            gradient_hidden_i += self.hidden_weights_g * gradient_c
-            gradient_hidden_i += self.dsigmoid(self.hidden_weights_i) * gradient_hidden_i
+            gradient_hidden_i += np.dot(self.hidden_weights_g[word], gradient_c[word])
+            gradient_hidden_i += np.dot(self.dsigmoid(self.hidden_weights_i[word]), gradient_hidden_i[word])
 
             # Gradient for hg
-            gradient_hidden_g += self.hidden_weights_i * gradient_c
-            gradient_hidden_g += self.dtanh(self.hidden_weights_g) * gradient_hidden_g
+            gradient_hidden_g += np.dot(self.hidden_weights_i[word], gradient_c[word])
+            gradient_hidden_g += np.dot(self.dtanh(self.hidden_weights_g[word]), gradient_hidden_g[word])
 
+            # print("H W SHAPE " + str(gradient_in_o.shape))
+            # print("G H SHAPE" + str( x_sent))
+            # print("G O H SHAPE" + str(gradient_hidden_o.shape))
             # Gate gradients, just a normal fully connected layer gradient
-            gradient_in_o += np.dot(word.T, gradient_hidden_o)
-            gradient_bias_o += gradient_hidden_o
-            dXo = np.dot(gradient_hidden_o, self.input_weights_o.T)
+            # gradient_in_o[word] += np.dot(x_sent, gradient_hidden_o[word])
+            gradient_in_o += np.dot(gradient_in_o[:, x_sent[word]], gradient_hidden_o[word])
+            gradient_bias_o += gradient_hidden_o[word]
+            dXo = np.dot(gradient_hidden_o, self.input_weights_o.T[word])
 
-            gradient_in_f += np.dot(word.T, gradient_hidden_f)
-            gradient_bias_f += gradient_hidden_f
-            dXf = np.dot(gradient_hidden_f, self.input_weights_f.T)
+            gradient_in_f += np.dot(gradient_in_f[:, x_sent[word]].T, gradient_hidden_f[word])
+            gradient_bias_f += gradient_hidden_f[word]
+            dXf = np.dot(gradient_hidden_f, self.input_weights_f.T[word])
 
-            gradient_in_i += np.dot(word.T, gradient_hidden_i)
-            gradient_bias_i += gradient_hidden_i
-            dXi = np.dot(gradient_hidden_i, self.input_weights_i.T)
+            gradient_in_i += np.dot(gradient_in_i[:, x_sent[word]].T, gradient_hidden_i[word])
+            gradient_bias_i += gradient_hidden_i[word]
+            dXi = np.dot(gradient_hidden_i, self.input_weights_i.T[word])
 
-            gradient_in_g += np.dot(word.T, gradient_hidden_g)
-            gradient_bias_g += gradient_hidden_g
-            dXg = np.dot(gradient_hidden_g, self.input_weights_g.T)
+            gradient_in_g += np.dot(gradient_in_g[:, x_sent[word]].T, gradient_hidden_g[word])
+            gradient_bias_g += gradient_hidden_g[word]
+            dXg = np.dot(gradient_hidden_g, self.input_weights_g.T[word])
 
             # As X was used in multiple gates, the gradient must be accumulated here
             dX = dXo + dXg + dXi + dXf
 
             # Split the concatenated X, so that we get our gradient of h_old
-            gradient_h_next = dX[:, :self.hidden_dimension]
-
+            # gradient_h_next[word] = dX[:, :self.hidden_dimension]
+            gradient_h_next[word] = dX
             # Gradient for c_old in c = hf * c_old + hi * hc
-            gradient_c_next = self.hidden_weights_f * gradient_c
+            gradient_c_next = np.dot(self.hidden_weights_f, gradient_c[word])
 
             # # Gradient of hidden_weights is the matrix multiplication (outer product) of the,
             # # delta (change) vector and the previous hidden state vector
@@ -286,29 +289,24 @@ class LSTM:
         # Long and short term memory
         c = np.zeros((steps + 1, self.hidden_dimension))
         h = np.zeros((steps + 1, self.hidden_dimension))
-        # print("HIDDEN SHAPE " + str(h.shape))
-        # print("HIDDEN W SHAPE " + str(self.hidden_weights_g.shape))
-        # print("HIDDEN B SHAPE " + str(self.bias_g.shape))
-        # print("INPUT W SHAPE " + str(self.input_weights_g.shape))
-        # print("OUTPUT W SHAPE " + str(self.output_weights.shape))
-        # print("C SHAPE " + str(c.shape))
+
+
         # The outputs at each time step. Again, we save them for later.
         output = np.zeros((steps, self.word_dimension))
 
         # For each time step word in the sentence
         for t in np.arange(steps):
 
-            # Gates -
-            g = np.tanh(np.dot(input_sentence[t], self.input_weights_g) + np.dot(h[t - 1], self.hidden_weights_g) + self.bias_g)
-            i = sigmoid(np.dot(input_sentence[t], self.input_weights_i) + np.dot(h[t - 1], self.hidden_weights_i) + self.bias_i)
-            f = sigmoid(np.dot(input_sentence[t], self.input_weights_f) + np.dot(h[t - 1], self.hidden_weights_f) + self.bias_f)
-            o = sigmoid(np.dot(input_sentence[t], self.input_weights_o) + np.dot(h[t - 1], self.hidden_weights_o) + self.bias_o)
 
-            c = (f * c[t - 1]) + (i * g)
-            h = o * np.tanh(c)
+            g = np.tanh(self.input_weights_g[:, input_sentence[t]] + np.dot(h[t - 1], self.hidden_weights_g) + self.bias_g)
+            i = sigmoid(self.input_weights_i[:, input_sentence[t]] + np.dot(h[t - 1], self.hidden_weights_i) + self.bias_i)
+            f = sigmoid(self.input_weights_f[:, input_sentence[t]] + np.dot(h[t - 1], self.hidden_weights_f) + self.bias_f)
+            o = sigmoid(self.input_weights_o[:, input_sentence[t]] + np.dot(h[t - 1], self.hidden_weights_o) + self.bias_o)
 
-            output_linear = np.dot(self.output_weights, h[t]) + self.bias_output
-            output[t] = self.softmax(output_linear)
+            c[t] = (f * c[t - 1]) + (i * g)
+            h[t] = o * np.tanh(c[t])
+
+            output[t] = self.softmax(np.dot(self.output_weights, h[t]) + self.bias_output)
 
         return [output, h, c]
 

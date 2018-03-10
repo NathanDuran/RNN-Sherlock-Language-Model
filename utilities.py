@@ -12,17 +12,9 @@ def save_training_data(path, data):
 def load_training_data(path):
     with open(path, 'rb') as file:
         saved_data = pickle.load(file)
-
-        data = dict(
-            x_train=saved_data["x_train"],
-            y_train=saved_data["y_train"],
-            word_to_index=saved_data["word_to_index"],
-            index_to_word=saved_data["index_to_word"],
-            vocabulary=saved_data["vocabulary"])
-
         file.close()
     print("Loaded file training data from %s." % path)
-    return data
+    return saved_data
 
 
 def save_model_parameters(path, model):

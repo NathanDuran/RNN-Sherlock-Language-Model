@@ -9,13 +9,12 @@ from utilities import *
 vocabulary_size = 8000
 hidden_layer = 100
 learning_rate = 0.005
-num_epoch = 1
+num_epoch = 10
 
 # File Paths
 file_path = "resources\Short Stories.txt"
 data_path = "./data/sherlock-training-data.pkl"
-model_path = "./data/rnn-sherlock-language-model " \
-             + datetime.datetime.today().strftime('%d-%m-%Y') \
+model_path = "./data/lstm-sherlock-language-model " \
              + " hidden_layers=" + str(hidden_layer) \
              + "  vocabulary=" + str(vocabulary_size) + ".npz"
 
@@ -109,11 +108,11 @@ index_to_word = data["index_to_word"]
 # load_model()
 
 # test_predictions()
-# # test_sgd()
+# test_sgd()
 # calc_loss()
 
-train(10)
-
+train(1000)
+calc_loss()
 #save_model()
 
 #generate_sentence()

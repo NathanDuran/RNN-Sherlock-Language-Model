@@ -1,10 +1,10 @@
 # RNN-Sherlock-Language-Model
 
-A Recurrent Neural Network Language Model trained on ['The Adventures of Sherlock Holmes'](https://sherlock-holm.es/ascii/).
+A Recurrent Neural Network Language Model trained on ['The Short Stories of Sherlock Holmes'](https://sherlock-holm.es/ascii/).
 
 The RNN is an adapted version of the one outlined in [this tutorial](http://www.wildml.com/2015/09/recurrent-neural-networks-tutorial-part-1-introduction-to-rnns/) by Denny Britz.
 
-The data directory contains pre-processed data set (rnn-sherlock-training-data.pkl) and a pre-trained model. The included model has
+The data directory contains pre-processed data set (sherlock-training-data.pkl) and pre-trained models. The included model has...
 
 To generate a sentence with the included pre-trained model simply run rnn_sherlock_lm.py and call load_model() followed by generate_sentence().
 
@@ -32,7 +32,7 @@ rnn.py contains the rnn code.
 rnn_sherlock_lm.py is the main script. It essentially acts as a wrapper to the underlying functions. It will create a RNN and attempt to load a data set from the /data directory.
 
 
-# Functions in rnn_sherlock_lm.py
+# Functions in sherlock_lm.py
 
 train(num_examples) Trains a model using Stochastic Gradient Descent for the number of specified training examples. Use train(len(x_train)) to train on the entire dataset.
 
@@ -47,3 +47,10 @@ def test_sgd(sentence_index=0) Tests Stochastic Gradient Descent for one sentenc
 save_model() Saves a model file to model_path.
 
 load_model() Loads a model file from model_path.
+
+# TODO
+Sort generate sentence function
+
+Add GRU
+
+Documentation
