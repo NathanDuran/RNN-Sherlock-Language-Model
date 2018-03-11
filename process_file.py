@@ -27,11 +27,6 @@ sentences = nltk.sent_tokenize(file)
 # Remove extra whitespace
 sentences = [' '.join(line.split()).strip() for line in sentences]
 
-# Write sentences to file
-# with open("resources\Short Stories (Sentences).txt", 'w') as file:
-#     for line in sentences:
-#         file.write(line + "\n")
-
 # Append SENTENCE_START and SENTENCE_END tokens
 sentences = ["%s %s %s" % (sentence_start_token, sentence, sentence_end_token) for sentence in
                       sentences]
@@ -44,11 +39,10 @@ tokenized_sentences = [nltk.word_tokenize(sentence) for sentence in sentences]
 word_frequency = nltk.FreqDist(itertools.chain(*tokenized_sentences))
 
 # Get the most common words and build index to word and word to index vectors
-vocabulary = word_frequency.most_common(vocabulary_size -1)
+vocabulary = word_frequency.most_common(vocabulary_size - 1)
 print("Found %d unique word tokens." % len(word_frequency.items()))
 
-# Generate word to index and index to words
-# Add the word not the frequency from our vocabulary
+# Generate word to index and index to words (Add the word not the frequency from our vocabulary data)
 index_to_word = [x[0] for x in vocabulary]
 index_to_word.append(unknown_token)
 
@@ -72,7 +66,7 @@ for sentence in tokenized_sentences:
     # All but the SENTENCE_END token
     for word in sentence[: -1]:
         x.append(word_to_index[word])
-    # # All but the SENTENCE_START token
+    # All but the SENTENCE_START token
     for word in sentence[1:]:
         y.append(word_to_index[word])
 
@@ -92,4 +86,9 @@ try:
     save_training_data(data_path, data)
 except FileNotFoundError as err:
     print("Error saving data " + str(err))
+
+# Write sentences to file
+# with open("resources\Short Stories (Sentences).txt", 'w') as file:
+#     for line in sentences:
+#         file.write(line + "\n")
 

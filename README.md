@@ -2,11 +2,12 @@
 
 A Recurrent Neural Network Language Model trained on ['The Short Stories of Sherlock Holmes'](https://sherlock-holm.es/ascii/).
 
-The RNN is an adapted version of the one outlined in [this tutorial](http://www.wildml.com/2015/09/recurrent-neural-networks-tutorial-part-1-introduction-to-rnns/) by Denny Britz.
+Contains a traditional RNN and an LSTM. The RNN is an adapted version of the one outlined in [this tutorial](http://www.wildml.com/2015/09/recurrent-neural-networks-tutorial-part-1-introduction-to-rnns/) by Denny Britz.
 
-The data directory contains pre-processed data set (sherlock-training-data.pkl) and pre-trained models. The included model has...
+The data directory contains a pre-processed data set (sherlock-training-data.pkl) and pre-trained models.
+The included models have...
 
-To generate a sentence with the included pre-trained model simply run rnn_sherlock_lm.py and call load_model() followed by generate_sentence().
+To generate a sentence with the included pre-trained model simply set the desired model_type (rnn or lstm) and run sherlock_lm.py and call generate_sentence().
 
 
 # Example of Generated Sentences
@@ -25,28 +26,35 @@ To generate a sentence with the included pre-trained model simply run rnn_sherlo
 
 process_file.py turns the raw text into training data sets and saves it in the /data directory.
 
-utilities.py contains functions for loading and saving the training data and models..
+utilities.py contains functions for loading and saving the training data and models.
 
 rnn.py contains the rnn code.
 
-rnn_sherlock_lm.py is the main script. It essentially acts as a wrapper to the underlying functions. It will create a RNN and attempt to load a data set from the /data directory.
+lstm.py contains the lstm code.
 
+sherlock_lm.py is the main script. It essentially acts as a wrapper to the underlying functions. It will create a RNN or LSTM (based on the model_type variable) and attempt to load a data set from the /data directory.
+
+sherlock-training-data.pkl contains 31716 prepared sentences from the all of the short stories of Sherlock Holmes.
 
 # Functions in sherlock_lm.py
 
-train(num_examples) Trains a model using Stochastic Gradient Descent for the number of specified training examples. Use train(len(x_train)) to train on the entire dataset.
+train(num_examples) - Trains a model using Stochastic Gradient Descent for the number of specified training examples. Use train(len(x_train)) to train on the entire dataset.
 
-generate_sentence() Generates a random sentence using the current model.
+generate_sentence() - Generates a random sentence using the current model.
 
-calc_loss(number_trainin_examples=1000) Calculates the current loss/error of the model for the specified number of training examples.
+calc_loss(number_trainin_examples=1000) - Calculates the current loss/error of the model for the specified number of training examples.
 
-test_predictions(sentence_index=0) Tests forward propagation and predictions for one sentence at the specified index.
+test_predictions(sentence_index=0) - Tests forward propagation and predictions for one sentence at the specified index.
 
-def test_sgd(sentence_index=0) Tests Stochastic Gradient Descent for one sentence at the specified index.
+test_sgd(sentence_index=0) - Tests Stochastic Gradient Descent for one sentence at the specified index.
 
-save_model() Saves a model file to model_path.
+build_model(type) - creates an empty RNN or LSTM model based on the specified type string ("rnn" or "lstm").
 
-load_model() Loads a model file from model_path.
+save_model(model, type) - Saves a model file to model_path.
+
+load_model(model, type) - Loads a model file from model_path.
+
+load_data() - Loads prepared training data from data_path.
 
 # TODO
 Sort generate sentence function

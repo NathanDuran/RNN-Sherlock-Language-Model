@@ -39,14 +39,13 @@ class RNN:
     # - y_train: The training data labels
     # - learning_rate: Initial learning rate for SGD
     # - num_epoch: Number of times to iterate through the complete dataset
-    # - evaluateLossAfter: Evaluate the loss after this many epochs
+    # - evaluate_loss_after: Evaluate the loss after this many epochs
     def train_with_sgd(model, x_train, y_train, learning_rate=0.005, num_epoch=100, evaluate_loss_after=5):
 
-        # Timer
-        current_time = time.asctime(time.localtime(time.time()))
-        print("Training started at : " + current_time + " for " + str(num_epoch) + " epochs")
+        # Time
+        print("Training started: " + time.asctime(time.localtime(time.time())) + " for ", num_epoch, " epochs")
 
-        # We keep track of the losses so we can plot them later
+        # Keep track of the losses so we can plot them later
         losses = []
         num_examples_seen = 0
 
@@ -59,25 +58,25 @@ class RNN:
                 num_examples_seen += 1
 
             # Display current epoch
-            print("%s: Number of examples seen = %d epoch = %d" % (
-                current_time, num_examples_seen, epoch))
+            print(time.asctime(time.localtime(time.time())) +
+                  ": Number of examples seen = ", num_examples_seen, "epoch = ", epoch)
 
             # Optionally evaluate the loss
             if epoch % evaluate_loss_after == 0:
 
                 loss = model.calculate_loss(x_train, y_train)
                 losses.append((num_examples_seen, loss))
-                print("%s: Loss after number of examples seen = %d epoch = %d: %f" % (
-                    current_time, num_examples_seen, epoch, loss))
+                print(time.asctime(time.localtime(time.time())) +
+                      ": Loss after number of examples seen = ", num_examples_seen, "epoch = ", epoch, " : ", loss)
 
                 # Adjust the learning rate if loss increases
                 if len(losses) > 1 and losses[-1][1] > losses[-2][1]:
                     learning_rate = learning_rate * 0.5
-                    print("Setting learning rate to %f" % learning_rate)
+                    print("Setting learning rate to ", learning_rate)
                     sys.stdout.flush()
 
-                    # Saving model parameters
-                    save_model_parameters(model.model_path, model)
+                # Save model parameters
+                save_model_parameters(model.model_path, model, "rnn")
 
     # Performs one step of SGD.
     # Calls back_prop_through_time for the input sentence
@@ -87,8 +86,11 @@ class RNN:
     # - learning_rate: Initial learning rate for SGD
     def sgd_step(self, x_sent, y_sent, learning_rate):
 
-        # Calculate the gradients
-        gradient_in_weights, gradient_out_weights, gradient_hidden_weights = self.back_prop_through_time(x_sent, y_sent)
+        # Forward propagate over an input sentence
+        output, hidden_state = self.forward_propagation(x_sent)
+
+        # Calculate the gradients and propagate backwards through cells
+        gradient_in_weights, gradient_out_weights, gradient_hidden_weights = self.back_prop_through_time(x_sent, y_sent, output, hidden_state)
 
         # Change parameters according to gradients and learning rate
         self.input_weights -= learning_rate * gradient_in_weights
@@ -100,17 +102,16 @@ class RNN:
     # Because the parameters are shared by all time steps in the network,
     # the gradient at each output depends not only on the calculations of the current time step,
     # but also the previous time steps.
-    # Calls forward_propagation for the input sentence
+    # Returns all calculated gradients
     #
     # - x_sent: The current sentence
     # - y_sent: The current sentence labels
-    def back_prop_through_time(self, x_sent, y_sent):
+    # - output: The output probabilities from forward propagation
+    # - hidden_state: The current hidden state (memory) of the cell
+    def back_prop_through_time(self, x_sent, y_sent, output, hidden_state):
 
         # Length of sentence
         sentence_length = len(y_sent)
-
-        # Perform forward propagation
-        output, hidden_state = self.forward_propagation(x_sent)
 
         # We accumulate the gradients in these variables
         gradient_in_weights = np.zeros(self.input_weights.shape)
@@ -123,18 +124,18 @@ class RNN:
         output_delta[np.arange(len(y_sent)), y_sent] -= 1.
 
         # For each word from the end of the sentence backwards...
-        for word in reversed(np.arange(sentence_length)):
+        for t in reversed(np.arange(sentence_length)):
 
             # Gradient of output_weights is the matrix multiplication (outer product) of the,
             # output change vector and hidden state vector (.T = transpose)
-            gradient_out_weights += np.outer(output_delta[word], hidden_state[word].T)
+            gradient_out_weights += np.outer(output_delta[t], hidden_state[t].T)
 
             # Initial delta calculation, the change in weights,
             # the dot product (sum) of ( output change vector * (1 -  hidden state vector ^ 2) )
-            delta = self.output_weights.T.dot(output_delta[word]) * (1 - (hidden_state[word] ** 2))
+            delta = self.output_weights.T.dot(output_delta[t]) * (1 - (hidden_state[t] ** 2))
 
             # Backpropagation through time (for at most self.bptt_truncate steps)
-            for bptt_step in reversed(np.arange(max(0, word - self.bptt_truncate), word + 1)):
+            for bptt_step in reversed(np.arange(max(0, t - self.bptt_truncate), t + 1)):
                 # Gradient of hidden_weights is the matrix multiplication (outer product) of the,
                 # delta (change) vector and the previous hidden state vector
                 gradient_hidden_weights += np.outer(delta, hidden_state[bptt_step - 1])
@@ -156,11 +157,11 @@ class RNN:
     #
     # - hidden_state: at time t, the 'memory' of the network.
     #   It is calculated based on the previous hidden state and the input at the current step..
-    #   hidden_state = tanh( (inputWeights * inputSentence[t]) + (hiddenWeights * hiddenState - 1) )
+    #   hidden_state = tanh( (input_weights * input_sentence[t]) + (hidden_weights * hidden_state[t - 1]) )
     #
     # - output: is the output at step t.
     #   The next word in a sentence it is a vector of probabilities across the vocabulary.
-    #   output = softmax( outputWeights * hiddenState )
+    #   output = softmax( output_weights * hidden_state )
     def forward_propagation(self, input_sentence):
 
         # The total number of time steps
@@ -169,9 +170,7 @@ class RNN:
         # During forward propagation we save all hidden states because we need them later.
         # We add one additional element for the initial hidden state, which we set to 0
         hidden_state = np.zeros((steps + 1, self.hidden_dimension))
-        # print("HIDDEN SHAPE " + str(hidden_state.shape))
-        #hidden_state[-1] = np.zeros(self.hidden_dimension)
-        # print("HIDDEN SHAPE " + str(hidden_state.shape))
+
         # The outputs at each time step. Again, we save them for later.
         output = np.zeros((steps, self.word_dimension))
 
@@ -179,8 +178,10 @@ class RNN:
         for t in np.arange(steps):
             # Note that we are indexing inputWeights by input_sentence[t].
             # This is the same as multiplying inputWeights with a one-hot vector.
-            hidden_state[t] = np.tanh(
-                self.input_weights[:, input_sentence[t]] + self.hidden_weights.dot(hidden_state[t - 1]))
+            # Calculate hidden_state at time t
+            hidden_state[t] = np.tanh(self.input_weights[:, input_sentence[t]] + self.hidden_weights.dot(hidden_state[t - 1]))
+
+            # Calculate output at time t
             output[t] = self.softmax(self.output_weights.dot(hidden_state[t]))
 
         return [output, hidden_state]
