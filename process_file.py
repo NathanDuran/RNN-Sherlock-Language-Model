@@ -39,12 +39,13 @@ tokenized_sentences = [nltk.word_tokenize(sentence) for sentence in sentences]
 word_frequency = nltk.FreqDist(itertools.chain(*tokenized_sentences))
 
 # Get the most common words and build index to word and word to index vectors
-vocabulary = word_frequency.most_common(vocabulary_size - 1)
+vocabulary = word_frequency.most_common(vocabulary_size - 2)
 print("Found %d unique word tokens." % len(word_frequency.items()))
 
 # Generate word to index and index to words (Add the word not the frequency from our vocabulary data)
 index_to_word = [x[0] for x in vocabulary]
 index_to_word.append(unknown_token)
+index_to_word.insert(0, "")
 
 # Dictionary of {word : index} pairs
 word_to_index = dict([(word, i) for i, word in enumerate(index_to_word)])
