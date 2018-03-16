@@ -1,5 +1,6 @@
 import itertools
 import nltk
+from keras.preprocessing.sequence import pad_sequences
 from utilities import *
 
 # File paths
@@ -14,10 +15,6 @@ sentence_end_token = "SENTENCE_END"
 # Number of words to hold in vocabulary
 vocabulary_size = 8000
 
-# Example and labeled training sets
-x_train = []
-y_train = []
-
 print("Processing file: ", file_path)
 file = open(file_path).read()
 
@@ -28,8 +25,7 @@ sentences = nltk.sent_tokenize(file)
 sentences = [' '.join(line.split()).strip() for line in sentences]
 
 # Append SENTENCE_START and SENTENCE_END tokens
-sentences = ["%s %s %s" % (sentence_start_token, sentence, sentence_end_token) for sentence in
-                      sentences]
+sentences = ["%s %s %s" % (sentence_start_token, sentence, sentence_end_token) for sentence in sentences]
 print("Parsed %d sentences." % (len(sentences)))
 
 # Tokenize the sentences into words
@@ -60,6 +56,9 @@ print("The least frequent word in our vocabulary is '%s' and appeared %d times."
     vocabulary[-1][0], vocabulary[-1][1]))
 print("Example sentence after Pre-processing: '%s'" % tokenized_sentences[0])
 
+# Example and labeled training sets
+x_train = []
+y_train = []
 # Create the training data
 for sentence in tokenized_sentences:
     x = []
@@ -74,13 +73,26 @@ for sentence in tokenized_sentences:
     x_train.append(x)
     y_train.append(y)
 
+# For Keras LSTM must pad the sequences to same length and return a numpy array
+x_train_pad = pad_sequences(x_train, maxlen=None, padding='post', value=0)
+y_train_pad = pad_sequences(y_train, maxlen=None, padding='post', value=0)
+
+num_sentences = x_train_pad.shape[0]
+print("Number of Sentences: ", num_sentences)
+max_input_len = x_train_pad.shape[1]
+print("Max Sentence length: ", max_input_len)
+
 # Save data to file
 data = dict(
     x_train=x_train,
     y_train=y_train,
+    x_train_pad=x_train_pad,
+    y_train_pad=y_train_pad,
     word_to_index=word_to_index,
     index_to_word=index_to_word,
-    vocabulary=vocabulary)
+    vocabulary=vocabulary,
+    num_sentences=num_sentences,
+    max_input_len=max_input_len)
 
 print("Saving training data")
 try:
