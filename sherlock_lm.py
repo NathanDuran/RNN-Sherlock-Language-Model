@@ -6,7 +6,7 @@ import lstm
 from utilities import *
 
 # Parameters
-model_type = "rnn"
+model_type = "lstm"
 vocabulary_size = 8000
 hidden_layer = 100
 learning_rate = 0.005
@@ -129,8 +129,8 @@ index_to_word = data["index_to_word"]
 #calc_loss()
 
 # Train model - use len(x_train) for full dataset
-# train(len(x_train))
-train(100)
+train(len(x_train))
+# train(100)
 
 # Save model after training
 save_model(model, model_type)

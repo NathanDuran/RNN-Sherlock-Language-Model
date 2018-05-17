@@ -12,6 +12,8 @@ To generate a sentence with the included pre-trained model simply set the desire
 
 # Example of Generated Sentences
 
+The following were generated with a vanilla RNN:
+
 10 Epoch - said of course, leaning neither, dear employer, Miss side was just to you; but returning groping, but he makes her that round she were an deduction before I could pray of turning I never the road of Oxfordshire of the extreme.
 
 20 Epoch - said of Holmes, Mrs. Holmes, though a moment were repaid in different, certainly from your instant of our word and, and to-day, then, you suppose, Alice to do for where?

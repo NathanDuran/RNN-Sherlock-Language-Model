@@ -18,7 +18,7 @@ import h5py
 
 file_path = "resources\Short Stories.txt"
 data_path = "./data/sherlock-training-data.pkl"
-model_path = "./data/keras-sherlock-language-model"
+model_path = "./data/keras-sherlock-language-model.hdf5"
 data = load_training_data(data_path)
 
 x_train = data["x_train_pad"]
@@ -48,7 +48,6 @@ model = Sequential()
 model.add(Masking(mask_value=0, input_shape=(max_input_len, )))
 model.add(Embedding(vocabulary_size, hidden_layer, input_length=max_input_len))
 model.add(LSTM(hidden_layer, return_sequences=True))
-# model.add(Dense(hidden_layer))
 model.add(TimeDistributed(Dense(vocabulary_size)))
 model.add(Activation('softmax'))
 
@@ -59,15 +58,9 @@ print(model.summary())
 # Train the model
 print("Training model...")
 history = model.fit_generator(training_data_generator.generate(), steps_per_epoch=num_sentences/batch_size, epochs=num_epoch)
-model.save(model_path + '.hdf5', overwrite=True)
+model.save(model_path, overwrite=True)
 
-# Final evaluation of the model
-scores = model.evaluate_generator(evaluate_data_generator.generate(), steps=10)
-print(scores)
-print(model.metrics_names)
-# print("Accuracy: %.2f%%" % (scores[1]*100))
-
-# list all data in history
+# List all data in history
 print(history.history.keys())
 
 # summarize history for loss
@@ -78,8 +71,15 @@ plt.xlabel('epoch')
 plt.legend(['train'], loc='upper left')
 plt.show()
 
+# Final evaluation of the model
+scores = model.evaluate_generator(evaluate_data_generator.generate(), steps=10)
+print(scores)
+print(model.metrics_names)
+# print("Accuracy: %.2f%%" % (scores[1]*100))
+
+
+
 # model = load_model(model_path + '.hdf5')
-# keras.utils.plot_model(model, to_file='model.png', show_shapes=False, show_layer_names=True, rankdir='TB')
 #
 # unknown_token = "UNKNOWN_TOKEN"
 # sentence_start_token = "SENTENCE_START"
