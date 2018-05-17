@@ -1,6 +1,6 @@
 # RNN-Sherlock-Language-Model
 
-A Recurrent Neural Network Language Model trained on ['The Short Stories of Sherlock Holmes'](https://sherlock-holm.es/ascii/).
+A Recurrent Neural Network Language Model trained on ['The Stories of Sherlock Holmes'](https://sherlock-holm.es/ascii/).
 
 Contains a traditional RNN and an LSTM. The RNN is an adapted version of the one outlined in [this tutorial](http://www.wildml.com/2015/09/recurrent-neural-networks-tutorial-part-1-introduction-to-rnns/) by Denny Britz.
 
@@ -36,7 +36,7 @@ lstm.py contains the lstm code.
 
 sherlock_lm.py is the main script. It essentially acts as a wrapper to the underlying functions. It will create a RNN or LSTM (based on the model_type variable) and attempt to load a data set from the /data directory.
 
-sherlock-training-data.pkl contains 31716 prepared sentences from the all of the short stories of Sherlock Holmes.
+sherlock-training-data.pkl contains 45464 prepared sentences from all of the stories of Sherlock Holmes.
 
 # Functions in sherlock_lm.py
 

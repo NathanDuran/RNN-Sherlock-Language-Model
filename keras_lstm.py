@@ -1,28 +1,20 @@
-import keras
-from keras.preprocessing import text
-from keras.callbacks import LambdaCallback
-from keras.models import Sequential, load_model
-from keras.layers import Dense, Activation, Masking, Embedding, TimeDistributed
-from keras.layers import LSTM
-from keras.optimizers import RMSprop
-from keras.preprocessing.sequence import pad_sequences
-from keras.preprocessing.text import one_hot, text_to_word_sequence
-from keras.utils import to_categorical
-from keras.utils.data_utils import get_file
-import numpy as np
-import random
+import os
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 import matplotlib.pyplot as plt
+from keras.layers import Dense, Activation, Embedding, TimeDistributed
+from keras.layers import LSTM
+from keras.models import Sequential
+from keras.optimizers import RMSprop
 from keras_batch_generator import KerasBatchGenerator
 from utilities import *
-import h5py
 
-file_path = "resources\Short Stories.txt"
+file_path = "resources\Complete Works.txt"
 data_path = "./data/sherlock-training-data.pkl"
-model_path = "./data/keras-sherlock-language-model.hdf5"
-data = load_training_data(data_path)
+model_path = "./data/sherlock-language-model keras.hdf5"
 
-x_train = data["x_train_pad"]
-y_train = data["y_train_pad"]
+data = load_training_data(data_path)
+x = data["x_padded"]
+y = data["y_padded"]
 word_to_index = data["word_to_index"]
 index_to_word = data["index_to_word"]
 vocabulary = data["vocabulary"]
@@ -34,21 +26,20 @@ print("Max Sentence length: ", max_input_len)
 
 # Parameters
 vocabulary_size = 8000
-hidden_layer = 100
+hidden_layer = 150
 learning_rate = 0.001
 num_epoch = 5
 batch_size = 20
 
-training_data_generator = KerasBatchGenerator(x_train, y_train, max_input_len, num_sentences, batch_size, vocabulary_size, skip_step=max_input_len)
-evaluate_data_generator = KerasBatchGenerator(x_train, y_train, max_input_len, 10, batch_size, vocabulary_size, skip_step=max_input_len)
+training_data_generator = KerasBatchGenerator(x_train, y_train, max_input_len, num_sentences, batch_size, vocabulary_size)
+evaluate_data_generator = KerasBatchGenerator(x_train, y_train, max_input_len, 10, batch_size, vocabulary_size)
 
 # Build the model
 print('Build model...')
 model = Sequential()
-model.add(Masking(mask_value=0, input_shape=(max_input_len, )))
-model.add(Embedding(vocabulary_size, hidden_layer, input_length=max_input_len))
+model.add(Embedding(vocabulary_size, hidden_layer, input_length=max_input_len, mask_zero=True))
 model.add(LSTM(hidden_layer, return_sequences=True))
-model.add(TimeDistributed(Dense(vocabulary_size)))
+model.add(TimeDistributed(Dense(vocabulary_size, input_shape=(max_input_len, hidden_layer))))
 model.add(Activation('softmax'))
 
 optimizer = RMSprop(lr=learning_rate)

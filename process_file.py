@@ -79,20 +79,20 @@ for sentence in tokenized_sentences:
     y_train.append(y)
 
 # For Keras LSTM must pad the sequences to same length and return a numpy array
-x_train_pad = pad_sequences(x_train, maxlen=None, padding='post', value=0)
-y_train_pad = pad_sequences(y_train, maxlen=None, padding='post', value=0)
+x_padded = pad_sequences(x_train, maxlen=None, padding='post', value=0)
+y_padded = pad_sequences(y_train, maxlen=None, padding='post', value=0)
 
-num_sentences = x_train_pad.shape[0]
+num_sentences = x_padded.shape[0]
 print("Number of Sentences: ", num_sentences)
-max_input_len = x_train_pad.shape[1]
+max_input_len = x_padded.shape[1]
 print("Max Sentence length: ", max_input_len)
 
 # Save data to file
 data = dict(
     x_train=x_train,
     y_train=y_train,
-    x_train_pad=x_train_pad,
-    y_train_pad=y_train_pad,
+    x_padded=x_padded,
+    y_padded=y_padded,
     word_to_index=word_to_index,
     index_to_word=index_to_word,
     vocabulary=vocabulary,
@@ -104,6 +104,3 @@ try:
     save_training_data(data_path, data)
 except FileNotFoundError as err:
     print("Error saving data " + str(err))
-
-
-

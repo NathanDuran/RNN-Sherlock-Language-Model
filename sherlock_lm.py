@@ -8,7 +8,7 @@ from utilities import *
 # Parameters
 model_type = "lstm"
 vocabulary_size = 8000
-hidden_layer = 100
+hidden_layer = 150
 learning_rate = 0.005
 num_epoch = 10
 
@@ -84,40 +84,40 @@ def build_model(type):
     return model
 
 
-# Save a model file to model_path
-def save_model(model, type):
-    try:
-        save_model_parameters(model_path, model, type)
-    except FileNotFoundError as err:
-        print("Error saving model! " + str(err))
-
-
-# Load a model file from model_path
-def load_model(model, type):
-    try:
-        load_model_parameters(model_path, model, type)
-    except FileNotFoundError as err:
-        print("No model file found! " + str(err))
-    return model
-
-
-# Load training data
-def load_data():
-    try:
-        data = load_training_data(data_path)
-    except FileNotFoundError as err:
-        print("No saved training data found!")
-    return data
+# # Save a model file to model_path
+# def save_model(model, type):
+#     try:
+#         save_model_parameters(model_path, model, type)
+#     except FileNotFoundError as err:
+#         print("Error saving model! " + str(err))
+#
+#
+# # Load a model file from model_path
+# def load_model(model, type):
+#     try:
+#         load_model_parameters(model_path, model, type)
+#     except FileNotFoundError as err:
+#         print("No model file found! " + str(err))
+#     return model
+#
+#
+# # Load training data
+# def load_data():
+#     try:
+#         data = load_training_data(data_path)
+#     except FileNotFoundError as err:
+#         print("No saved training data found!")
+#     return data
 
 
 # Create model
 model = build_model(model_type)
 
 # Load model parameters
-model = load_model(model, model_type)
+model = load_model_parameters(model_path, model, type)
 
 # Load training data
-data = load_data()
+data = load_training_data(data_path)
 x_train = data["x_train"]
 y_train = data["y_train"]
 word_to_index = data["word_to_index"]
@@ -129,11 +129,11 @@ index_to_word = data["index_to_word"]
 #calc_loss()
 
 # Train model - use len(x_train) for full dataset
-train(len(x_train))
-# train(100)
+# train(len(x_train))
+train(100)
 
 # Save model after training
-save_model(model, model_type)
+save_model_parameters(model_path, model, type)
 
 # Generate a sentence with the current model
 generate_sentence()

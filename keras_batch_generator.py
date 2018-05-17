@@ -5,7 +5,7 @@ from keras.utils import to_categorical
 
 class KerasBatchGenerator(object):
 
-    def __init__(self, x_train, y_train, max_input_len, num_sentences, batch_size, vocabulary_size, skip_step=5):
+    def __init__(self, x_train, y_train, max_input_len, num_sentences, batch_size, vocabulary_size):
         self.x_train = x_train
         self.y_train = y_train
         self.max_input_len = max_input_len
@@ -16,9 +16,6 @@ class KerasBatchGenerator(object):
         # data set - once the data reaches the end of the data set it will reset
         # back to zero
         self.index = 0
-        # skip_step is the number of words which will be skipped before the next
-        # batch is skimmed from the data set
-        self.skip_step = skip_step
 
     def generate(self):
         x = np.zeros((self.batch_size, self.max_input_len))
