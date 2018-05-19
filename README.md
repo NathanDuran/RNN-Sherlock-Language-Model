@@ -12,7 +12,7 @@ To generate a sentence with the included pre-trained model simply set the desire
 
 # Example of Generated Sentences
 
-The following were generated with a vanilla RNN:
+## Vanilla RNN:
 
 10 Epoch - said of course, leaning neither, dear employer, Miss side was just to you; but returning groping, but he makes her that round she were an deduction before I could pray of turning I never the road of Oxfordshire of the extreme.
 
@@ -23,6 +23,10 @@ The following were generated with a vanilla RNN:
 40 Epoch - said of Holmes, protruded Toller to introduce any three together.
 
 50 Epoch - said of a serious, for success --" said Holmes," of no means recollect for weeks fact that, and when Holmes suddenly all my trivial, then, you shall tell it out and found.
+
+## Keras LSTM:
+
+10 Epoch - the old man, and the name of the be in the house.
 
 # Included Python Files
 
@@ -52,11 +56,6 @@ test_sgd(sentence_index=0) - Tests Stochastic Gradient Descent for one sentence 
 
 build_model(type) - creates an empty RNN or LSTM model based on the specified type string ("rnn" or "lstm").
 
-save_model(model, type) - Saves a model file to model_path.
-
-load_model(model, type) - Loads a model file from model_path.
-
-load_data() - Loads prepared training data from data_path.
 
 # TODO
 Sort generate sentence function

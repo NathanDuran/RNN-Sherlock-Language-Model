@@ -7,13 +7,13 @@ from utilities import *
 
 # Parameters
 model_type = "lstm"
-vocabulary_size = 8000
+vocabulary_size = 15000
 hidden_layer = 150
 learning_rate = 0.005
 num_epoch = 10
 
 # File Paths
-file_path = "resources\Short Stories.txt"
+file_path = "resources\Complete Works.txt"
 data_path = "./data/sherlock-training-data.pkl"
 model_path = "./data/sherlock-language-model " + model_type + ".npz"
 
@@ -82,32 +82,6 @@ def build_model(type):
         print("Creating LSTM Model")
         model = lstm.LSTM(model_path, vocabulary_size, hidden_layer)
     return model
-
-
-# # Save a model file to model_path
-# def save_model(model, type):
-#     try:
-#         save_model_parameters(model_path, model, type)
-#     except FileNotFoundError as err:
-#         print("Error saving model! " + str(err))
-#
-#
-# # Load a model file from model_path
-# def load_model(model, type):
-#     try:
-#         load_model_parameters(model_path, model, type)
-#     except FileNotFoundError as err:
-#         print("No model file found! " + str(err))
-#     return model
-#
-#
-# # Load training data
-# def load_data():
-#     try:
-#         data = load_training_data(data_path)
-#     except FileNotFoundError as err:
-#         print("No saved training data found!")
-#     return data
 
 
 # Create model
