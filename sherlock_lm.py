@@ -13,9 +13,9 @@ learning_rate = 0.005
 num_epoch = 10
 
 # File Paths
-file_path = "resources\Complete Works.txt"
+
 data_path = "./data/sherlock-training-data.pkl"
-model_path = "./data/sherlock-language-model " + model_type + ".npz"
+model_path = "./models/sherlock-language-model " + model_type + ".npz"
 
 
 # Train a model using Stochastic Gradient Descent

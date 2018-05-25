@@ -4,7 +4,7 @@ from keras.preprocessing.sequence import pad_sequences
 from utilities import *
 
 # File paths
-file_path = "resources\Complete Works.txt"
+txt_file_path = "data\Complete Works.txt"
 data_path = "./data/sherlock-training-data.pkl"
 
 # Sentence tokens
@@ -15,8 +15,8 @@ sentence_end_token = "SENTENCE_END"
 # Number of words to hold in vocabulary
 vocabulary_size = 15000
 
-print("Processing file: ", file_path)
-file = open(file_path).read()
+print("Processing file: ", txt_file_path)
+file = open(txt_file_path).read()
 
 # Split into sentences
 sentences = nltk.sent_tokenize(file)
@@ -25,7 +25,7 @@ sentences = nltk.sent_tokenize(file)
 sentences = [' '.join(line.split()).strip() for line in sentences]
 
 # Write sentences to file
-with open("resources\Complete Works (Sentences).txt", 'w') as file:
+with open("data\Complete Works (Sentences).txt", 'w') as file:
     for line in sentences:
         file.write(line + "\n")
 

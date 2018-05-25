@@ -1,8 +1,6 @@
 import os
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'  # Suppress tensorflow warnings
 
-from tflearn.data_utils import pad_sequences
-
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 import math
 import matplotlib.pyplot as plt
 from keras.layers import Dense, Activation, Embedding, TimeDistributed
@@ -12,9 +10,8 @@ from keras.optimizers import RMSprop
 from keras_batch_generator import KerasBatchGenerator
 from utilities import *
 
-file_path = "resources\Complete Works.txt"
 data_path = "./data/sherlock-training-data.pkl"
-model_path = "./data/sherlock-language-model keras.hdf5"
+model_path = "./models/sherlock-language-model keras.hdf5"
 
 # Load data
 data = load_training_data(data_path)
@@ -67,6 +64,8 @@ model.add(Activation('softmax'))
 
 optimizer = RMSprop(lr=learning_rate)
 model.compile(loss='categorical_crossentropy', optimizer=optimizer, metrics=['accuracy'])
+
+model = load_model(model_path)
 print(model.summary())
 
 # Train the model
@@ -114,7 +113,6 @@ sentence_tokens = np.zeros((1, max_input_len), dtype=int)
 sentence_tokens[0][0] = word_to_index[sentence_start_token]
 
 sentence = []
-# sampled_word = word_to_index[sentence_start_token]
 word_index = 1
 
 # Repeat until we get an end token
