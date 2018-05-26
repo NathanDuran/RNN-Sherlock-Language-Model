@@ -24,28 +24,6 @@ def train(num_examples):
     print("Time taken for ", num_epoch, " epoch over ", num_examples, " training data: ", time_taken, " seconds")
 
 
-# Generate a random sentence using the current model
-def generate_sentence():
-
-    sentence = ""
-    sentence_list = model.generate_sentence(word_to_index, index_to_word)
-
-    for i, word in enumerate(sentence_list):
-
-        if word in ["``", "''"]:
-            word = '"'
-
-        if word is '"' or word in string.punctuation:
-            sentence += word
-        else:
-            sentence += " " + word
-
-    sentence = re.sub(r'\s([?.!,"](?:\s|$))', r'\1', sentence)
-    sentence.lstrip()
-    print("Generated sentence: " + sentence)
-    return sentence
-
-
 # Calculate the current loss/error of the model
 def calc_loss(number_training_examples=1000):
     # Test loss function (limit to 1000 examples to save time)
@@ -109,8 +87,10 @@ train(100)
 # Save model after training
 save_model_parameters(model_path, model, type)
 
-# Generate a sentence with the current model
-generate_sentence()
+# Generate a random sentence using the current model
+sentence_tokens = model.generate_sentence(word_to_index, index_to_word)
+sentence = tokens_to_sentence(sentence_tokens)
+print("Generated sentence: " + sentence)
 
 
 

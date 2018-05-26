@@ -42,11 +42,11 @@ sherlock_lm.py is the main script. It essentially acts as a wrapper to the under
 
 sherlock-training-data.pkl contains 45464 prepared sentences from all of the stories of Sherlock Holmes.
 
+keras_lstm.py Keras implementation of the language model.
+
 # Functions in sherlock_lm.py
 
 train(num_examples) - Trains a model using Stochastic Gradient Descent for the number of specified training examples. Use train(len(x_train)) to train on the entire dataset.
-
-generate_sentence() - Generates a random sentence using the current model.
 
 calc_loss(number_trainin_examples=1000) - Calculates the current loss/error of the model for the specified number of training examples.
 
@@ -59,7 +59,5 @@ build_model(type) - creates an empty RNN or LSTM model based on the specified ty
 
 # TODO
 Sort generate sentence function
-
-Add GRU
 
 Documentation

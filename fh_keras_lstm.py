@@ -1,9 +1,6 @@
 import os
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'  # Suppress tensorflow warnings
 
-# os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"   # Run on CPU
-# os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
-
 import math
 from keras.layers import Dense, Activation, Embedding, TimeDistributed
 from keras.layers import LSTM
@@ -13,9 +10,9 @@ from keras.optimizers import RMSprop
 from keras_batch_generator import KerasBatchGenerator
 from utilities import *
 
-data_path = "./data/sherlock-training-data.pkl"
-model_path = "./models/sherlock-language-model keras.hdf5"
-# weights_path = "./models/sherlock-language-model keras-weights.hdf5"
+data_path = "/data/sherlock-training-data.pkl"
+model_path = "/model/sherlock-language-model keras.hdf5"
+output_path = "/output/sherlock-language-model keras.hdf5"
 
 # Load data
 data = load_training_data(data_path)
@@ -32,7 +29,7 @@ vocabulary_size = 15000
 hidden_layer = 150
 learning_rate = 0.001
 num_epoch = 1
-batch_size = 20
+batch_size = 50
 test_split = 0.02
 
 print("------------------------------------")
@@ -72,22 +69,20 @@ model.compile(loss='categorical_crossentropy', optimizer=optimizer, metrics=['ac
 # Load the model
 print("------------------------------------")
 print('Load model...')
-model = load_model(model_path)
-# model.load_weights(weights_path)
+if os.path.isfile(model_path):
+    print("Loaded model from {}".format(model_path))
+    model = load_model(model_path)
+
 print(model.summary())
 
-# Save the checkpoint in the /output folder
-# filepath = "/models/mnist-cnn-best.hdf5"
-
-# Keep only a single checkpoint, the best over test accuracy.
-checkpoint = ModelCheckpoint(model_path, monitor='val_acc', verbose=1, save_best_only=True, save_weights_only=False, mode='max')
+# Keep only a single model, the best over test accuracy.
+checkpoint = ModelCheckpoint(output_path, monitor='val_acc', verbose=1, save_best_only=True, save_weights_only=False, mode='max')
 
 # Train the model
 print("------------------------------------")
 print("Training model...")
 history = model.fit_generator(training_data_generator.generate(), steps_per_epoch=len(x_train)/batch_size, validation_data=test_data_generator.generate(), validation_steps=len(x_test)/batch_size, epochs=num_epoch, callbacks=[checkpoint])
-model.save("./models/sherlock-language-model keras.hdf5", overwrite=True)
-# model.save_weights("/models/sherlock-language-model keras-weights.hdf5")
+model.save("/models/sherlock-language-model keras.hdf5", overwrite=True)
 
 # Evaluate the model
 print("------------------------------------")
@@ -98,39 +93,5 @@ scores = model.evaluate_generator(evaluate_data_generator.generate(), steps=10)
 print("Validation data: ")
 print("Loss: ", scores[0], " Accuracy: ", scores[1])
 
-
 # Generate a sentence
-unknown_token = "UNKNOWN_TOKEN"
-sentence_start_token = "SENTENCE_START"
-sentence_end_token = "SENTENCE_END"
-
-# We start the sentence with the start token
-sentence_tokens = np.zeros((1, max_input_len), dtype=int)
-sentence_tokens[0][0] = word_to_index[sentence_start_token]
-
-sentence = []
-word_index = 1
-
-# Repeat until we get an end token
-for i in range(0, max_input_len):
-
-    # Generate some word predictions
-    sentence_probs = model.predict_proba(sentence_tokens, batch_size=1, verbose=1)
-    word_probs = sentence_probs[0][i]
-
-    sampled_word = np.argmax(word_probs)
-
-    # We don't want to sample unknown words
-    if sampled_word == word_to_index[unknown_token]:
-        # Remove the unknown token and get second most likely word
-        word_probs = np.delete(word_probs, sampled_word)
-        sampled_word = np.argmax(word_probs)
-
-    if sampled_word == word_to_index[sentence_end_token]:
-        break
-
-    sentence.append(index_to_word[sampled_word])
-    sentence_tokens[0][word_index] = sampled_word
-    word_index += 1
-
-print(sentence)
+keras_generate_sentence(model, max_input_len, word_to_index, index_to_word)

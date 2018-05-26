@@ -1,3 +1,6 @@
+import re
+import string
+
 import numpy as np
 import pickle
 
@@ -43,3 +46,68 @@ def load_model_parameters(path, model, model_type):
         model.output_weights, model.bias_output = npzfile["output_weights"], npzfile["bias_output"]
     print("Loaded model parameters from %s. " % path)
     return model
+
+
+# Generate a sentence with a Keras model
+def keras_generate_sentence(model, max_input_len, word_to_index, index_to_word):
+
+    # Special tokens
+    unknown_token = "UNKNOWN_TOKEN"
+    sentence_start_token = "SENTENCE_START"
+    sentence_end_token = "SENTENCE_END"
+
+    # We start the sentence with the start token
+    sentence_word_ids = np.zeros((1, max_input_len), dtype=int)
+    sentence_word_ids[0][0] = word_to_index[sentence_start_token]
+
+    sentence_tokens = []
+    word_index = 1
+
+    # Repeat until we get an end token
+    for i in range(0, max_input_len):
+
+        # Generate some word predictions
+        sentence_probs = model.predict_proba(sentence_word_ids, batch_size=1, verbose=1)
+        word_probs = sentence_probs[0][i]
+
+        sampled_word = np.argmax(word_probs)
+
+        # We don't want to sample unknown words
+        if sampled_word == word_to_index[unknown_token]:
+            # Remove the unknown token and get second most likely word
+            word_probs = np.delete(word_probs, sampled_word)
+            sampled_word = np.argmax(word_probs)
+
+        if sampled_word == word_to_index[sentence_end_token]:
+            break
+
+        sentence_tokens.append(index_to_word[sampled_word])
+        sentence_word_ids[0][word_index] = sampled_word
+        word_index += 1
+
+    # Convert tokens to string
+    sentence = tokens_to_sentence(sentence_tokens)
+
+    # # Write sentences to file
+    # with open(file_path, 'a') as file:
+    #     file.write(sentence + "\n")
+
+    print("Generated sentence: " + sentence)
+    return sentence
+
+
+# Generate sentence from tokens
+def tokens_to_sentence(sentence_tokens):
+
+    sentence = ""
+
+    for i, word in enumerate(sentence_tokens):
+
+        if word is '"' or word in string.punctuation:
+            sentence += word
+        else:
+            sentence += " " + word
+
+    sentence = re.sub(r'\s([?.!,"](?:\s|$))', r'\1', sentence)
+    sentence.lstrip()
+    return sentence
