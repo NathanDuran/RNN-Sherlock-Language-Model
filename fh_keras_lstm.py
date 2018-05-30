@@ -82,7 +82,6 @@ checkpoint = ModelCheckpoint(output_path, monitor='val_acc', verbose=1, save_bes
 print("------------------------------------")
 print("Training model...")
 history = model.fit_generator(training_data_generator.generate(), steps_per_epoch=len(x_train)/batch_size, validation_data=test_data_generator.generate(), validation_steps=len(x_test)/batch_size, epochs=num_epoch, callbacks=[checkpoint])
-model.save("/models/sherlock-language-model keras.hdf5", overwrite=True)
 
 # Evaluate the model
 print("------------------------------------")

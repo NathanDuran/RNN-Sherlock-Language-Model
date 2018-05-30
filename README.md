@@ -5,9 +5,10 @@ A Recurrent Neural Network Language Model trained on ['The Stories of Sherlock H
 Contains a traditional RNN and an LSTM. The RNN is an adapted version of the one outlined in [this tutorial](http://www.wildml.com/2015/09/recurrent-neural-networks-tutorial-part-1-introduction-to-rnns/) by Denny Britz.
 
 The data directory contains a pre-processed data set (sherlock-training-data.pkl) and pre-trained models.
-The included models have...
+The included RNN and Keras models have been trained for 50 epochs.
 
 To generate a sentence with the included pre-trained model simply set the desired model_type (rnn or lstm) and run sherlock_lm.py and call generate_sentence().
+For the keras_lstm.py simply run the script.
 
 
 # Example of Generated Sentences
@@ -28,11 +29,12 @@ To generate a sentence with the included pre-trained model simply set the desire
 
 10 Epoch - the old man, and the name of the be in the house.
 
+
 # Included Python Files
 
 process_file.py turns the raw text into training data sets and saves it in the /data directory.
 
-utilities.py contains functions for loading and saving the training data and models.
+utilities.py contains functions for loading and saving the training data, models and functions for generating sentences from the Keras models.
 
 rnn.py contains the rnn code.
 
@@ -40,9 +42,10 @@ lstm.py contains the lstm code.
 
 sherlock_lm.py is the main script. It essentially acts as a wrapper to the underlying functions. It will create a RNN or LSTM (based on the model_type variable) and attempt to load a data set from the /data directory.
 
+keras_lstm.py Keras implementation of the language model.
+
 sherlock-training-data.pkl contains 45464 prepared sentences from all of the stories of Sherlock Holmes.
 
-keras_lstm.py Keras implementation of the language model.
 
 # Functions in sherlock_lm.py
 
@@ -58,6 +61,8 @@ build_model(type) - creates an empty RNN or LSTM model based on the specified ty
 
 
 # TODO
-Sort generate sentence function
+- Sort generate sentence function
 
-Documentation
+- Log all metrics over multiple runs
+
+- Documentation

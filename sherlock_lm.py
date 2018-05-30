@@ -1,6 +1,4 @@
 import timeit
-import string
-import re
 import rnn
 import lstm
 from utilities import *
