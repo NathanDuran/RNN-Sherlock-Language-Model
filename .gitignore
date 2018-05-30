@@ -3,3 +3,6 @@
 *.pyo
 
 .idea/*
+/.floydexpt
+/.floydignore
+/data/.floyddata

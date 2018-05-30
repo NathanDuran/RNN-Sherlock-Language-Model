@@ -94,3 +94,6 @@ print("Loss: ", scores[0], " Accuracy: ", scores[1])
 
 # Generate a sentence
 keras_generate_sentence(model, max_input_len, word_to_index, index_to_word)
+
+#### Save model to break Floydhub ####
+model.save(model_path, overwrite=True)
