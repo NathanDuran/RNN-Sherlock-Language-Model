@@ -80,6 +80,8 @@ def keras_generate_sentence(model, max_input_len, word_to_index, index_to_word):
 
         if sampled_word == word_to_index[sentence_end_token]:
             break
+        if word_index >= max_input_len:
+            break
 
         sentence_tokens.append(index_to_word[sampled_word])
         sentence_word_ids[0][word_index] = sampled_word

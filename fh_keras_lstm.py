@@ -11,8 +11,8 @@ from keras_batch_generator import KerasBatchGenerator
 from utilities import *
 
 data_path = "/data/sherlock-training-data.pkl"
-model_path = "/model/sherlock-language-model keras.hdf5"
-output_path = "/output/sherlock-language-model keras.hdf5"
+model_path = "/model/fh-sherlock-language-model keras.hdf5"
+output_path = "/output/fh-sherlock-language-model keras.hdf5"
 
 # Load data
 data = load_training_data(data_path)
@@ -28,8 +28,8 @@ max_input_len = data["max_input_len"]
 vocabulary_size = 15000
 hidden_layer = 150
 learning_rate = 0.001
-num_epoch = 1
-batch_size = 50
+num_epoch = 10
+batch_size = 100
 test_split = 0.02
 
 print("------------------------------------")
@@ -95,5 +95,3 @@ print("Loss: ", scores[0], " Accuracy: ", scores[1])
 # Generate a sentence
 keras_generate_sentence(model, max_input_len, word_to_index, index_to_word)
 
-#### Save model to break Floydhub ####
-model.save(model_path, overwrite=True)

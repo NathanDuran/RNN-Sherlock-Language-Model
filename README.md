@@ -10,6 +10,11 @@ The included RNN and Keras models have been trained for 50 epochs.
 To generate a sentence with the included pre-trained model simply set the desired model_type (rnn or lstm) and run sherlock_lm.py and call generate_sentence().
 For the keras_lstm.py simply run the script.
 
+Floydhub commands:
+
+Intial run: floyd run --gpu --data nathanduran/datasets/sherlock-holmes:/data --env tensorflow-1.8 "python fh_keras_lstm.py"
+
+Resume run: floyd run --gpu --data nathanduran/datasets/sherlock-holmes:/data --data nathanduran/projects/rnn-sherlock-language-model/1/output:/model --env tensorflow-1.8 "python fh_keras_lstm.py"
 
 # Example of Generated Sentences
 
@@ -63,6 +68,8 @@ build_model(type) - creates an empty RNN or LSTM model based on the specified ty
 # TODO
 - Sort generate sentence function
 
-- Log all metrics over multiple runs
+- Log all metrics over multiple runs?
+
+- Better splitting of sentences
 
 - Documentation
